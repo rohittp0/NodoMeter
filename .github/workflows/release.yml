@@ -39,8 +39,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-
 
+      - name: Configure Flutter
+        run: flutter config --no-cli-animations --no-analytics
+
       - name: Get dependencies
-        run: flutter pub get --no-cli-animations
+        run: flutter pub get --offline
 
       - name: Build APK
         run: flutter build apk
