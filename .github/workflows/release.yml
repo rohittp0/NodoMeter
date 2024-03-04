@@ -52,6 +52,14 @@ jobs:
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/nodo_meter.apk
 
       - name: Create Release
-        uses: ncipollo/release-action@v1
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          artifacts: "build/app/outputs/flutter-apk/nodo_meter.apk"
+          tag_name: latest
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: build/app/outputs/flutter-apk/nodo_meter.apk
