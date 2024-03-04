@@ -1,11 +1,25 @@
 name: Build and Release
 
 on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
     tags:
       - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  packages: write
 
 jobs:
   build-and-release:
@@ -15,6 +29,18 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+
+      - name: Cache Flutter Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            .flutter-plugins
+            .flutter-plugins-dependencies
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml', '**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
 
       - name: Get dependencies
         run: flutter pub get
