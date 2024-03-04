@@ -21,11 +21,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fetchFuelLevel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if(mounted) {
-        _fetchFuelLevel();
-      }
-    });
+    _startTimer();
   }
 
   @override
@@ -34,16 +30,27 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void _startTimer() async {
+    final prefs = await SharedPreferences.getInstance();
+    final duration = Duration(seconds: prefs.getInt('refreshInterval') ?? 60);
+
+    _timer = Timer.periodic(duration, (_) {
+      if(context.mounted) {
+        _fetchFuelLevel();
+      }
+    });
+  }
+
   void _navigateToSettingsPage() {
-    Navigator.pushNamed(context, '/settings');
+    Navigator.pushReplacementNamed(context, '/settings');
   }
 
   void _navigateToWifiPage() {
-    Navigator.pushNamed(context, '/wifi');
+    Navigator.pushReplacementNamed(context, '/wifi');
   }
 
   void _showSnackBar(String message) {
-    if(!mounted) return;
+    if(!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
